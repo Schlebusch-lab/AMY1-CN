@@ -12,11 +12,11 @@ Dietary change has long been considered a major selective force in human evoluti
 ## Contents of this repository
 
 * **Supplementary methods**
-  - [Supplementary methods (pdf)](Methods/Supplementary_methods.pdf)  
-  - [Supplementary methods (Rmd)](Methods/Supplementary_methods.Rmd)  
+  - [Supplementary methods (pdf)](Supplementary_methods/Supplementary_methods.pdf)  
+  - [Supplementary methods (Rmd)](Supplementary_methods/Supplementary_methods.Rmd)  
 
 * **Supplementary materials**
-  - [Supplementary tables](Tables/Supplementary_tables.xlsx)
+  - [Supplementary tables](Supplementary_materials/Supplementary_tables.xlsx)
 
 * **Figures**
   - Figures (Figures 1-4) (to be added upon acceptance)
