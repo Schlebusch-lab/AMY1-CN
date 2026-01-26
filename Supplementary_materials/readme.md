@@ -1,4 +1,4 @@
-# Description of supplementary tables				
+# Description of supplementary tables (Supplementary_tables.xlsx)			
 				
 ## AMY1 CN estimates			
 
