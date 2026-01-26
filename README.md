@@ -6,6 +6,9 @@ Andrea Soler i Núñez, Cécile Joly, Camille Humbert, Afifa Chowdhury, Susanne 
 **Citation**  
 (to be added upon acceptance) 
 
+**Contact**
+Andrea Soler i Núñez (andrea.soler-i-nunez@ebc.uu.se)
+
 ## Contents of this repository
 
 * **Supplementary methods**
