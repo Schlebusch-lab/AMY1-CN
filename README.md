@@ -7,7 +7,7 @@ Andrea Soler i Núñez, Cécile Joly, Camille Humbert, Afifa Chowdhury, Susanne 
   - Supplementary methods (Rmd) (to be added upon acceptance)  
 
 * **Supplementary materials**
-  - [Supplementary tables (xlsx)](Supplementary_materials)
+  - Supplementary tables (xlsx) (to be added upon acceptance)
 
 * **Figures**
   - Figures 1-4 (pdf) (to be added upon acceptance)
