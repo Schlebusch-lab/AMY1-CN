@@ -82,8 +82,8 @@ model_null <- brm(AMY1_CN ~ (1|gr(sample,cov=VCV)) + (1|population),
                   family=student(),
                   save_pars=save_pars(all=TRUE),
                   sample_prior=TRUE,
-                  chains=4, iter=4000, warmup=3000,
-                  control=list(adapt_delta=0.999, max_treedepth=12))
+                  chains=4, iter=12000, warmup=4000,
+                  control=list(adapt_delta=0.99))
 ```
 
 # Model assumptions and stability
