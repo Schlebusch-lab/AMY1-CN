@@ -1,6 +1,6 @@
 # Genetic relatedness
 
-```{ruby}
+```ruby
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set
 
@@ -26,7 +26,7 @@ plink --bfile ${DB} --remove related_list_full_names.txt --make-bed --out ${DB}_
 
 # ILR transformation
 
-```{ruby}
+```ruby
 # Select compositional variables
 comp_vars <- ddPCR_data_set[,c("agriculture", "pastoralism", "fishing", 
                                "gathering", "hunting")]
@@ -68,7 +68,7 @@ data <- cbind(ddPCR_data_set, ilr_coords)
 
 Below are two examples of the `brms` and `glmmTMB` syntax used in modeling *AMY1* CN in the **ddPCR data set**.  
 
-```{ruby}
+```ruby
 # Example of glmmTMB model synthax
 model_null <- glmmTMB(AMY1_CN ~ PC1 + PC2 + PC3 + PC4 + (1|population),
                       data=ddPCR_data_set,
