@@ -6,7 +6,7 @@ Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afif
 ## Contents of this repository
 
 * **Supplementary methods**
-  - [Overview of code (.Md)](Supplementary_methods/00_Overview.md) 
+  - Overview of code (.Md) [here](Supplementary_methods/00_Overview.md) 
   - SLIM code 
 
 * **Supplementary materials**
