@@ -1,6 +1,6 @@
 # Genetic relatedness
 
-```{ruby }
+```{ruby}
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set
 
