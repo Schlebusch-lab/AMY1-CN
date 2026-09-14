@@ -1,6 +1,6 @@
 # Genetic relatedness
 
-```{bash, eval=FALSE}
+```{ruby }
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set
 
@@ -26,7 +26,7 @@ plink --bfile ${DB} --remove related_list_full_names.txt --make-bed --out ${DB}_
 
 # ILR transformation
 
-```{r, eval=FALSE}
+```{ruby }
 # Select compositional variables
 comp_vars <- ddPCR_data_set[,c("agriculture", "pastoralism", "fishing", 
                                "gathering", "hunting")]
@@ -68,7 +68,7 @@ data <- cbind(ddPCR_data_set, ilr_coords)
 
 Below are two examples of the `brms` and `glmmTMB` syntax used in modeling *AMY1* CN in the **ddPCR data set**.  
 
-```{r, eval=FALSE}
+```{ruby }
 # Example of glmmTMB model synthax
 model_null <- glmmTMB(AMY1_CN ~ PC1 + PC2 + PC3 + PC4 + (1|population),
                       data=ddPCR_data_set,
@@ -90,7 +90,7 @@ model_null <- brm(AMY1_CN ~ (1|gr(sample,cov=VCV)) + (1|population),
 
 ## `glmmTMB` specifics
 
-```{r, eval=FALSE}
+```{ruby }
 # Models assumptions and stability (glmmTMB)
 for (name in model_names) {
   # 'models' is a list of all models run with the same data set
@@ -114,7 +114,7 @@ for (name in model_names) {
 
 ## `brms` specifics
 
-```{r, eval=FALSE}
+```{ruby }
 # Models assumptions and stability (brms)
 for (name in model_names) {
   model <- models[[name]]
@@ -157,14 +157,14 @@ for (name in model_names) {
 
 The **Likelihood ratio test** (LRT) was performed with `anova` function of the `stats` package between nested models run with the same data.
 
-```{r, eval=FALSE}
+```{ruby }
 # LRT
 anova(null_model, Agr.vs.NonAgr_model)
 ```
 
 ## `brms` specifics
 
-```{r, eval=FALSE}
+```{ruby }
 # ROPE
 rope_result <- rope(model)
 plot(rope_result)
@@ -174,7 +174,7 @@ equivalence_test(model, verbose = FALSE)
 
 ## Make IBD matrix
 
-```{bash, eval=FALSE}
+```{ruby }
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set_unrelated
 
@@ -187,7 +187,7 @@ plink --bfile ${DB}_filtered --distance square 1-ibs --out ${DB}_filtered
 
 ## Make NJ tree
 
-```{r, eval=FALSE}
+```{ruby }
 # Read 1-IBS matrix and format for later use
 IBS_mdist <- read_table("ddPCR_data_set_unrelated_filtered.mdist", col_names=FALSE) 
 IBS_mdist.id <- read_table("ddPCR_data_set_unrelated_filtered.mdist.id", col_names=FALSE) 
@@ -219,14 +219,14 @@ tree_chrono <- chronos(tree_rooted, model="correlated")
 
 ## Phylogenetic variance-covariance (VCV) matrix
 
-```{r, eval=FALSE}
+```{ruby }
 # Obtain VCV matrix from rooted phylogenetic tree
 VCV <- vcv.phylo(tree_chrono)
 ```
 
 ## Principal component analysis
 
-```{bash, eval=FALSE}
+```{ruby }
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set_unrelated
 
@@ -249,7 +249,7 @@ plink --bfile ${DB}_chr1_LD_filtered_50_10_0.8 --pca \
 
 ## Supervised ADMIXTURE
 
-```{bash, eval=FALSE}
+```{ruby }
 # Supervised ADMIXTURE with 3 sources
 admixture --cv=10 -j3 --supervised ${FILE}.bed 3
 ```
@@ -259,7 +259,7 @@ admixture --cv=10 -j3 --supervised ${FILE}.bed 3
 
 ## Geographical distances between non-Sub-Saharan populations and East Africa
 
-```{r, eval=FALSE}
+```{ruby }
 # Migration waypoints
 migration_origin <- c(39.5, 9.0)         
 arabian_peninsula <- c(38.5, 35.0)     
@@ -341,7 +341,7 @@ OOA_geo_distances <- OOA_pop_coords %>%
 
 ## Measures of diversity at the *AMY1* locus
 
-```{r, eval=FALSE}
+```{ruby }
 # Calculate diversity metrics (no rarefication)
 OOA_diversity_stats <- OOA_dataset %>%
   group_by(pop) %>%  
@@ -379,7 +379,7 @@ OOA_diversity_stats_RAREFIED <- OOA_dataset %>%
 
 # **Measures of phylogenetic signal**
 
-```{r, eval=FALSE}
+```{ruby }
 # PREPARE OBJECT: 
 # AMY1 CN + POPULATION METADATA to be combined with PHYLOGENETIC TREE
 tree <- comparative.data(phy=tree_chrono, 
@@ -391,21 +391,21 @@ tree$data$sample <- phy$phy$tip.label
 
 ## Phylogenetic signal
 
-```{r, eval=FALSE}
+```{ruby }
 # Phylogenetic signal
 phyloSignal(phylo4d(tree, data["AMY1_CN"]), reps=1000)
 ```
 
 ## Phylogenetic correlogram
 
-```{r, eval=FALSE}
+```{ruby }
 # Phylogenetic correlograms
 phyloCorrelogram(phylo4d(tree, data["AMY1_CN"]), trait="AMY1_CN")
 ```
 
 ## Local indicators of phylogenetic association
 
-```{r, eval=FALSE}
+```{ruby }
 # Local indicators of phylogenetic association
 lipaMoran(phylo4d(tree, data["AMY1_CN"]), reps=1000, alternative="greater")
 lipaMoran(phylo4d(tree, data["AMY1_CN"]), reps=1000, alternative="less")
