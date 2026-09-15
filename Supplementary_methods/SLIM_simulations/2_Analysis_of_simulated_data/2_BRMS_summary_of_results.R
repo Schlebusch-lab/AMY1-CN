@@ -27,7 +27,7 @@ design <- "
 
 #### READ ALL MODEL SUMMARIES
 
-BRMS_results_path <- "/proj/human_evolution_uu/backup/private/Analyses/a_solernunez/project_amylase/simulations/03_results_from_simulation/brms/EVEN_SAMPLING/no.maf0.05/"
+BRMS_results_path <- ".../simulations/03_results_from_simulation/brms/"
 
 files <- list.files(
   BRMS_results_path,
@@ -46,40 +46,7 @@ model_summary_all <- dplyr::bind_rows(lapply(files, function(file) {
 rownames(model_summary_all) <- NULL
 
 
-#### SIMULATION SUMMARY PLOTS
-
-s_values <- unique(model_summary_all$s_value)
-
-for (s in s_values) {
-
-  df_s <- subset(model_summary_all, s_value == s)
-
-  plot_simulation_results <- function(model_name) {
-
-    df <- subset(df_s, model == model_name)
-
-    ggplot(df, aes(x = Estimate, y = Label, group = file, color = CIs_include_zero)) +
-      geom_errorbar(aes(xmin = CI_lower, xmax = CI_upper), width = 0.2, position = position_dodge(width = 0.7)) +
-      geom_point(position = position_dodge(width = 0.7), size = 2) +
-      geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
-      labs(title = paste0("Posterior means across simulation replicates (", s, ")\nModel: ", model_name), x = "Posterior mean", y = "", color = "95% CI") +
-      scale_color_manual(values = c("YES" = "gray50", "NO" = "black"), labels = c("YES" = "Includes zero", "NO" = "Excludes zero")) +
-      theme_bw()
-    }
-
-  # Make the two model plots
-
-  Simulation_plot_Null <- plot_simulation_results("Null")
-  Simulation_plot_Agr <- plot_simulation_results("Agr.vs.NonAgr")
-
-  pdf(paste0(BRMS_results_path, "00_SUMMARY_OF_SIMULATIONS_", s, ".pdf"), width = 12, height = 7)
-  print(Simulation_plot_Null + plot_spacer() + Simulation_plot_Agr + plot_layout(design=design))
-  dev.off()
-
-}
-
-
-#### SUMMARY OF PROPORTION OF REPLICATES WHERE CI EXCLUDES ZERO
+#### SIMULATION SUMMARY
 
 significance_summary <- model_summary_all %>%
 
@@ -95,11 +62,6 @@ significance_summary <- model_summary_all %>%
     percent_CI_excludes_zero_and_positive = round(percent_CI_excludes_zero - percent_CI_excludes_zero_and_negative, 2),
 
     .groups = "drop")
-
-
-#### SAVE
-
-write.table(significance_summary, paste0(BRMS_results_path, "00_SUMMARY_OF_SIMULATIONS_CI_fractions.txt"), sep = "\t", row.names = FALSE, quote = FALSE)
 
 
 #### PLOT
