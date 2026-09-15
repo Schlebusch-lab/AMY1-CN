@@ -7,25 +7,8 @@ suppressMessages(library("patchwork"))
 suppressMessages(library("dplyr"))
 suppressMessages(library(tidyr))
 
-### ### ### ### ### ### ### ### aesthetics ### ### ### ### ### ### ### ### ### 
 
-model_palette <- c(Null = "orange2", Agr.vs.NonAgr = "red3")
-
-design <- "
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    BBBBBCCCCC
-    BBBBBCCCCC
-    BBBBBCCCCC
-  "
-
-
-#### READ ALL MODEL SUMMARIES
+#### READ ALL MODEL RESULTS
 
 BRMS_results_path <- ".../simulations/03_results_from_simulation/brms/"
 
