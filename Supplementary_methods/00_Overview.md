@@ -30,8 +30,6 @@ plink --bfile ${DB} --remove related_list_full_names.txt --make-bed --out ${DB}_
 
 ## Model formulations
 
-Below are two examples of the `brms` and `glmmTMB` syntax used in modeling *AMY1* CN in the ddPCR data set.  
-
 ### `glmmTMB`
 
 ```ruby
@@ -46,7 +44,7 @@ model_agriculture <- glmmTMB(AMY1_CN ~ PC1 + PC2 + PC3 + PC4 + agriculture_ILR +
 
 ### `brms`
 
-```
+```ruby
 model_null <- brm(AMY1_CN ~ (1|gr(sample,cov=VCV)) + (1|population),
                   data = brms_data,
                   data2=list(VCV=VCV),
