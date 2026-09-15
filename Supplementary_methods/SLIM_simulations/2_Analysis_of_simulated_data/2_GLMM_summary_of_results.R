@@ -6,33 +6,8 @@ suppressMessages(library("ggplot2"))
 suppressMessages(library("patchwork"))
 suppressMessages(library("dplyr"))
 
-### ### ### ### ### ### ### ### aesthetics ### ### ### ### ### ### ### ### ### 
 
-effect_labels <- c(
-  "b_AgrVSNonAgrNon-Agriculture"= "Agr. vs. non-agriculture",
-  "AgrVSNonAgrNon-Agriculture"= "Agr. vs. non-agriculture",
-  "b_AgrVSNonAgrNonMAgriculture"= "Agr. vs. non-agriculture")
-
-model_palette <- c(Null = "orange2", Agr.vs.NonAgr = "red3")
-
-  design <- "
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    AAAAACCCCC
-    BBBBBCCCCC
-  "
-
-########################################################################################################################
-
-
-#### READ ALL MODEL SUMMARIES
+#### READ ALL MODEL RESULTS
 
 GLMM_results_path <- ".../project_amylase/simulations/03_results_from_simulation/GLMM/"
 
@@ -51,8 +26,6 @@ model_summary_all <- dplyr::bind_rows(lapply(files, function(file) {
 
 rownames(model_summary_all) <- NULL
 
-
-########################################################################################################################
 
 
 #### SIMULATION SUMMARY
