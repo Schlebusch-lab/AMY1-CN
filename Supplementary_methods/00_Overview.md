@@ -5,6 +5,7 @@ This document contains code chunks (R and bash) used in the data handling or ana
 - [Modeling AMY1 CN based on subsistence and demography](#modeling-amy1-cn-based-on-subsistence-and-demography)
     * [Model formulations](#model-formulations)
   	* [Model assumptions and stability](#model-assumptions-and-stability)
+  	* [Posterior predictive checks](#posterior-predictive-checks)
   	* [Model comparisons](#model-comparisons)
 - [Data transformations before model fit](#data-transformations-before-model-fit)
   	* [ILR transformation](#ilr-transformation)
@@ -13,7 +14,7 @@ This document contains code chunks (R and bash) used in the data handling or ana
   	* [Phylogenetic variance-covariance matrix](#phylogenetic-variance-covariance-matrix)
   	* [Principal component analysis from genotype data](#principal-component-analysis-from-genotype-data)
   	* [Supervised ADMIXTURE](#supervised-admixture)
- - [Out of Africa dispersal](#out-of-africa-dispersal)
+- [Out of Africa dispersal](#out-of-africa-dispersal)
   	* [Geographical distances between non-Sub-Saharan populations and East Africa](#geographical-distances-between-non-sub-saharan-populations-and-east-africa)
   	* [Measures of diversity at the AMY1 locus](#measures-of-diversity-at-the-AMY1-locus)
 - [Measures of phylogenetic signal](#measures-of-phylogenetic-signal)
@@ -162,6 +163,37 @@ for (name in model_names) {
   check_collinearity(model)
 }
 ```
+
+## Posterior predictive checks
+
+```ruby
+
+# 'models' is a list of all models run with the same data set
+
+models <- list(model_null, model_agriculture, ...) 
+model_names <- names(models)
+
+for (model_name in names(models)) {
+  fit <- models[[model_name]]
+  y <- fit$data[[as.character(fit$formula$formula[[2]])]]
+
+  cat("Posterior diagnostics for: ", model_name)
+
+  # Print several posterior-predictive checks
+  print(pp_check(fit, type = "hist", binwidth=1, ndraws=11))
+  print(pp_check(fit, type = "ecdf_overlay", ndraws=30))
+  print(pp_check(fit, type = "stat", stat = "mean"))
+  print(pp_check(fit, type = "stat", stat = "sd"))
+
+  # If grouping variable exists (i.e. Agr.vs.NonAgr and All.vs.All models):
+  if ("dominant_activity" %in% names(fit$data)) {
+    print(pp_check(fit, type = "ecdf_overlay_grouped", group = "dominant_activity"))}
+  if ("AgrVSNonAgr" %in% names(fit$data)) {
+  print(pp_check(fit, type = "ecdf_overlay_grouped", group = "AgrVSNonAgr"))}
+}
+
+```
+
 
 ## Model comparisons
 
