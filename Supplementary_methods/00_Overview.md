@@ -3,9 +3,9 @@ This document contains code chunks (R and bash) used in the data handling or ana
 
 Table of contents:
 - [Filtering of data sets](#filtering-of-datasets)
-  	* [Genetic relatedness](##genetic-relatedness)
+  	* [Genetic relatedness](#genetic-relatedness)
 - [Modeling AMY1 CN based on subsistence and demography](#modeling-amy1-cn-based-on-subsistence-and-demography)
-    * [Model formulations](##model-formulations)
+    * [Model formulations](#model-formulations)
   	* [Model assumptions and stability]()
   	* [Model comparisons]()
 - [Data transformations before model fit]()
