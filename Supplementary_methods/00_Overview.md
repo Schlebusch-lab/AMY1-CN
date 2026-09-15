@@ -1,4 +1,6 @@
-# Genetic relatedness
+# Filtering of data sets
+
+## Genetic relatedness
 
 ```ruby
 # PLINK file set comprised of .bed, .bim and .fam files
@@ -24,57 +26,27 @@ cat related_list.txt | while read line; \
 plink --bfile ${DB} --remove related_list_full_names.txt --make-bed --out ${DB}_unrelated
 ```
 
-# ILR transformation
+# Modeling AMY1 CN based on subsistence and demography
+
+## Model formulations
+
+Below are two examples of the `brms` and `glmmTMB` syntax used in modeling *AMY1* CN in the ddPCR data set.  
+
+### `glmmTMB`
 
 ```ruby
-# Select compositional variables
-comp_vars <- ddPCR_data_set[,c("agriculture", "pastoralism", "fishing", 
-                               "gathering", "hunting")]
-
-# Replace zeros if present
-comp_vars_no_zeros <- if (any(comp_vars == 0)) {
-  cmultRepl(comp_vars, method = "CZM", output = "p-counts")} else {comp_vars}
-
-# Convert to compositional class
-comp <- acomp(comp_vars_no_zeros)
-
-# Number of variables
-D <- ncol(comp)
-
-# FUNCTION: Create ILR contrast vectors and compute ILR coordinates (new variables)
-create_ilr_vector <- function(i, D) {
-  v <- rep(-sqrt(1 / (D * (D - 1))), D)
-  v[i] <- sqrt((D - 1) / D)
-  return(v)}
-
-log_comp <- log(comp)                                                        # Log of variables
-log_comp_mat <- matrix(unclass(log_comp), nrow = nrow(log_comp), ncol = D)   # Matrix format
-colnames(log_comp_mat) <- colnames(comp)                                     # Column names
-
-ilr_coords <- matrix(NA, nrow = nrow(ddPCR_data_set), ncol = D)              # Empty matrix
-colnames(ilr_coords) <- paste0(colnames(comp_vars), "_ILR")                  # Column names
-
-# Apply function to calculate IRL transformations
-for (i in 1:D) {
-  v <- create_ilr_vector(i, D)
-  ilr_coords[, i] <- log_comp_mat %*% v}
-
-# Append ILR coordinates to original dataset
-data <- cbind(ddPCR_data_set, ilr_coords)
-```
-
-
-# Models formulation
-
-Below are two examples of the `brms` and `glmmTMB` syntax used in modeling *AMY1* CN in the **ddPCR data set**.  
-
-```ruby
-# Example of glmmTMB model synthax
 model_null <- glmmTMB(AMY1_CN ~ PC1 + PC2 + PC3 + PC4 + (1|population),
                       data=ddPCR_data_set,
                       family=gaussian)
 
-# Example of brms model synthax
+model_agriculture <- glmmTMB(AMY1_CN ~ PC1 + PC2 + PC3 + PC4 + agriculture_ILR + (1|population),
+                            data=ddPCR_data_set,
+                            family=gaussian)
+```
+
+### `brms`
+
+```
 model_null <- brm(AMY1_CN ~ (1|gr(sample,cov=VCV)) + (1|population),
                   data = brms_data,
                   data2=list(VCV=VCV),
@@ -84,17 +56,30 @@ model_null <- brm(AMY1_CN ~ (1|gr(sample,cov=VCV)) + (1|population),
                   sample_prior=TRUE,
                   chains=4, iter=12000, warmup=4000,
                   control=list(adapt_delta=0.99))
+
+model_agriculture <- brm(AMY1_CN ~ (1|gr(sample,cov=VCV)) + (1|population),
+                        data = brms_data,
+                        data2=list(VCV=VCV),
+                        prior=set_prior("normal(0,0.5)", class="sd", group="sample"),
+                        family=student(),
+                        save_pars=save_pars(all=TRUE),
+                        sample_prior=TRUE,
+                        chains=4, iter=12000, warmup=4000,
+                        control=list(adapt_delta=0.99))
 ```
 
-# Model assumptions and stability
+## Model assumptions and stability
 
-## `glmmTMB` specifics
+### `glmmTMB`
 
 ```ruby
-# Models assumptions and stability (glmmTMB)
+
+# 'models' is a list of all models run with the same data set
+
+models <- list(model_null, model_agriculture, ...) 
+model_names <- names(models)
+
 for (name in model_names) {
-  # 'models' is a list of all models run with the same data set
-  # (e.g. model_null, model_agriculture, model_pastoralism)
   model <- models[[name]]
   
   # Coefficients summary
@@ -112,10 +97,15 @@ for (name in model_names) {
 }
 ```
 
-## `brms` specifics
+### `brms`
 
 ```ruby
-# Models assumptions and stability (brms)
+
+# 'models' is a list of all models run with the same data set
+
+models <- list(model_null, model_agriculture, ...) 
+model_names <- names(models)
+
 for (name in model_names) {
   model <- models[[name]]
   
@@ -151,41 +141,118 @@ for (name in model_names) {
 }
 ```
 
-# Model comparisons
+## Model comparisons
 
-## `glmmTMB` specifics
-
-The **Likelihood ratio test** (LRT) was performed with `anova` function of the `stats` package between nested models run with the same data.
+## `glmmTMB` (Likelihood Ratio Test)
 
 ```ruby
-# LRT
-anova(null_model, Agr.vs.NonAgr_model)
+
+# 'models' is a list of all models run with the same data set
+
+models <- list(model_null, model_agriculture, ...) 
+model_names <- names(models)
+
+# First model is the null model
+model_null <- models[[1]]
+
+# Loop over the remaining models
+for (model_name in names(models)[-1]) {
+  model <- models[[model_name]]
+  pval <- anova(glmm_null, model)$`Pr(>Chisq)`[2]
+  cat("Null >", model_name)
+  cat("LRT p-value:", pval, "\n", sep = " ")}
+
 ```
 
-## `brms` specifics
+## `brms` (Bayes factor)
 
 ```ruby
-# ROPE
-rope_result <- rope(model)
-plot(rope_result)
 
-equivalence_test(model, verbose = FALSE)
+# BAYES FACTOR
+
+# 'models' is a list of all models run with the same data set
+
+models <- list(model_null, model_agriculture, ...) 
+model_names <- names(models)
+
+bridge_null <- bridgesampling::bridge_sampler(models$Null, silent=TRUE, maxiter=10000)
+
+bf_results <- lapply(names(models), function(model_name) {
+  # Skip Null model
+  if (model_name == "Null") return(NULL)
+
+  # Run bridge_sampler for all other models
+  fit <- models[[model_name]]
+  bridge_fit <- bridgesampling::bridge_sampler(fit, silent=TRUE, maxiter=10000)
+
+  # Calculate BF between null and each alternative model
+  bf_val <- bf(bridge_fit, bridge_null)
+
+  list(model = model_name, bf = bf_val)})
+
+# Remove NULL (=model_null) from results
+bf_results <- Filter(Negate(is.null), bf_results)
+
+bf_results
+
 ```
 
-## Make IBD matrix
+# Data transformations before model fit
+
+## ILR transformation
+
+```ruby
+
+# Select compositional variables in data set
+comp_vars <- ddPCR_data_set[,c("agriculture", "pastoralism", "fishing", 
+                               "gathering", "hunting")]
+
+# Replace zeros (if present)
+comp_vars_no_zeros <- if (any(comp_vars == 0)) {
+  cmultRepl(comp_vars, method = "CZM", output = "p-counts")} else {comp_vars}
+
+# Convert to compositional class
+comp <- acomp(comp_vars_no_zeros)
+
+# Save number of variables
+D <- ncol(comp)
+
+# FUNCTION: Create ILR contrast vectors and compute ILR coordinates (new variables)
+create_ilr_vector <- function(i, D) {
+  v <- rep(-sqrt(1 / (D * (D - 1))), D)
+  v[i] <- sqrt((D - 1) / D)
+  return(v)}
+
+log_comp <- log(comp)                                                        # Log of variables
+log_comp_mat <- matrix(unclass(log_comp), nrow = nrow(log_comp), ncol = D)   # Matrix format
+colnames(log_comp_mat) <- colnames(comp)                                     # Column names
+
+ilr_coords <- matrix(NA, nrow = nrow(ddPCR_data_set), ncol = D)              # Empty matrix
+colnames(ilr_coords) <- paste0(colnames(comp_vars), "_ILR")                  # New column names
+
+# Apply function to calculate IRL transformations
+for (i in 1:D) {
+  v <- create_ilr_vector(i, D)
+  ilr_coords[, i] <- log_comp_mat %*% v}
+
+# Append ILR coordinates to original dataset
+data <- cbind(ddPCR_data_set, ilr_coords)
+```
+
+## IBS matrix from genotype data
 
 ```ruby
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set_unrelated
 
-# Filter variants not in chr 1, with any level of missingness or MAF<0.2
-plink --bfile ${DB} --allow-no-sex --chr 1 --geno 0 --maf 0.2 --make-bed --out ${DB}_filtered
+# Filter variants with any level of missingness or (e.g.) MAF<0.2
+plink --bfile ${DB} --allow-no-sex --geno 0 --maf 0.2 --make-bed --out ${DB}_filtered
 
 # Make IBS-based distance matrix in square format
 plink --bfile ${DB}_filtered --distance square 1-ibs --out ${DB}_filtered
 ```
 
-## Make NJ tree
+## Neighbor-Joining tree from IBS matrix
 
 ```ruby
 # Read 1-IBS matrix and format for later use
@@ -197,7 +264,7 @@ colnames(IBS_mdist) <- IBS_mdist.id$X2
 # Reorder IBS matrix to match order in the dataframe containing ddPCR data
 ddPCR_data_set <- ddPCR_data_set[match(rownames(IBS_mdist), ddPCR_data_set$sample),]   
 
-# Make tree from 1-IBS matrix with NJ algorithm
+# Make NJ tree from 1-IBS matrix
 tree <- nj(as.dist(IBS_mdist))
 
 # Give tree tip labels and node numbers to identify best node for rooting
@@ -208,12 +275,12 @@ tree$node.label <- as.character(1:tree$Nnode)
 plot(tree, "fan", show.node.label=TRUE, use.edge.length=FALSE, align.tip.label=TRUE)
 
 # Select node for rooting
-node.tree <- as_tibble(tree)[as_tibble(tree)$label=="130", "node"][[1]] # Ex. node: 130
+node.tree <- as_tibble(tree)[as_tibble(tree)$label=="130", "node"][[1]]      # Ex. node: 130
 
 # Root tree
 tree_rooted <- root(tree, node=node.tree, resolve.root=TRUE)
 
-# Chronometricize tree
+# Chronometricize/Ultrametricize tree
 tree_chrono <- chronos(tree_rooted, model="correlated")
 ```
 
@@ -224,25 +291,22 @@ tree_chrono <- chronos(tree_rooted, model="correlated")
 VCV <- vcv.phylo(tree_chrono)
 ```
 
-## Principal component analysis
+## Principal component analysis from genotype data
 
 ```ruby
 # PLINK file set comprised of .bed, .bim and .fam files
 DB=ddPCR_data_set_unrelated
 
-# Keep variants in chr 1
-plink --bfile ${DB} --chr 1 --out ${DB}_chr1
-
 # Identify variants in LD: 50 kb window size, 10 kb step size, 0.8 r2 threshold
-plink --bfile ${DB}_chr1 --indep-pairwise 50 10 0.8 --out ${DB}_LD_results_50_10_0.8
+# Generates two files: ...prune.in and ...prune.out
+plink --bfile ${DB} --indep-pairwise 50 10 0.8 --out ${DB}_LD_results_50_10_0.8
 
-# Remove variables in LD (keep variables in prune.in file)
-plink --bfile ${DB}_chr1 --extract ${DB}_LD_results_50_10_0.8.prune.in --make-bed \
-    --out ${DB}_chr1_LD_filtered_50_10_0.8
+# Remove variables in LD (=keep variables in prune.in file)
+plink --bfile ${DB} --extract ${DB}_LD_results_50_10_0.8.prune.in --make-bed --out ${DB}_LD_filtered_50_10_0.8
 
 # Run PCR
-plink --bfile ${DB}_chr1_LD_filtered_50_10_0.8 --pca \
-    --out ${DB}_chr1_LD_filtered_50_10_0.8
+# Generates two files: ...eigenvec and ...eigenval
+plink --bfile ${DB}_LD_filtered_50_10_0.8 --pca --out ${DB}_LD_filtered_50_10_0.8
 ```
 
 # **Ancient Eurasians**
@@ -250,8 +314,22 @@ plink --bfile ${DB}_chr1_LD_filtered_50_10_0.8 --pca \
 ## Supervised ADMIXTURE
 
 ```ruby
-# Supervised ADMIXTURE with 3 sources
-admixture --cv=10 -j3 --supervised ${FILE}.bed 3
+# Set variables
+FILE=...                # PLINK file including all individuals to be used in the ADMIXTURE run
+                        # For supervised admixture: 4 files needed ${FILE}.bed, ${FILE}.bim, ${FILE}.fam, ${FILE}.pop
+KVAL=3                  # Integer specifying number of clusters
+OUTDIR=...              # Output directory
+
+for i in {1..10}
+	do mkdir "$i"
+		cd "$i"
+		admixture --cv=10 -j3 -s $RANDOM --supervised ${FILE}.bed ${KVAL}
+		mv ${OUTDIR}/$i/$(basename ${FILE}).${KVAL}.P ${OUTDIR}/$(basename ${FILE}).Kval.${KVAL}.Iter.$i.P
+		mv ${OUTDIR}/$i/$(basename ${FILE}).${KVAL}.Q ${OUTDIR}/$(basename ${FILE}).Kval.${KVAL}.Iter.$i.Q
+		cd ..
+		rm -r "$i"
+	done
+
 ```
 
 
@@ -260,7 +338,7 @@ admixture --cv=10 -j3 --supervised ${FILE}.bed 3
 ## Geographical distances between non-Sub-Saharan populations and East Africa
 
 ```ruby
-# Migration waypoints
+# Geographical coordinates of migration waypoints
 migration_origin <- c(39.5, 9.0)         
 arabian_peninsula <- c(38.5, 35.0)     
 turkey <- c(27.0, 38.0)              
@@ -382,6 +460,7 @@ OOA_diversity_stats_RAREFIED <- OOA_dataset %>%
 ```ruby
 # PREPARE OBJECT: 
 # AMY1 CN + POPULATION METADATA to be combined with PHYLOGENETIC TREE
+
 tree <- comparative.data(phy=tree_chrono, 
                          data=RD_modeling_data, 
                          names.col="sample", vcv=TRUE, na.omit=FALSE)
