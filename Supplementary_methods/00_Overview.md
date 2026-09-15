@@ -333,8 +333,6 @@ plink --bfile ${DB} --extract ${DB}_LD_results_50_10_0.8.prune.in --make-bed --o
 plink --bfile ${DB}_LD_filtered_50_10_0.8 --pca --out ${DB}_LD_filtered_50_10_0.8
 ```
 
-# **Ancient Eurasians**
-
 ## Supervised ADMIXTURE
 
 ```ruby
