@@ -2,10 +2,16 @@ This document contains code chunks (R and bash) used in the data handling or ana
 
 
 Table of contents:
-- [This is the link text](#heading-title)
-  	* ...
-  	* ...
-- ...
+- [Filtering of data sets](#filtering-of-datasets)
+  	* [Genetic relatedness](##genetic-relatedness)
+- [Modeling AMY1 CN based on subsistence and demography](#modeling-amy1-cn-based-on-subsistence-and-demography)
+    * []()
+  	* []()
+  	* []()
+  	* []()
+  	* []()
+  	* []()
+
 - ...
 
 # Filtering of data sets
