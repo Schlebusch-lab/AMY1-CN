@@ -6,13 +6,13 @@ Table of contents:
   	* [Genetic relatedness](#genetic-relatedness)
 - [Modeling AMY1 CN based on subsistence and demography](#modeling-amy1-cn-based-on-subsistence-and-demography)
     * [Model formulations](#model-formulations)
-  	* [Model assumptions and stability]()
-  	* [Model comparisons]()
-- [Data transformations before model fit]()
-  	* [ILR transformation]()
-  	* [IBS matrix from genotype data]()
-  	* [Neighbor-Joining tree from IBS matrix]()
-  	* [Phylogenetic variance-covariance (VCV) matrix]()
+  	* [Model assumptions and stability](#model-assumptions-and-stability)
+  	* [Model comparisons](#model-comparisons)
+- [Data transformations before model fit](#data-transformations-before-model-fit)
+  	* [ILR transformation](#ilr-transformation)
+  	* [IBS matrix from genotype data](#ibs-matrix-from-genotype-data)
+  	* [Neighbor-Joining tree from IBS matrix](#neighbor-joining-tree-from-ibs-matrix)
+  	* [Phylogenetic variance-covariance matrix](#phylogenetic-variance-covariance-matrix)
   	* [Principal component analysis from genotype data]()
   	* [Supervised ADMIXTURE]()
  - [Out of Africa dispersal]()
@@ -308,7 +308,7 @@ tree_rooted <- root(tree, node=node.tree, resolve.root=TRUE)
 tree_chrono <- chronos(tree_rooted, model="correlated")
 ```
 
-## Phylogenetic variance-covariance (VCV) matrix
+## Phylogenetic variance-covariance matrix
 
 ```ruby
 # Obtain VCV matrix from rooted phylogenetic tree
