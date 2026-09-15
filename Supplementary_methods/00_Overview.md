@@ -1,7 +1,5 @@
 This document contains code chunks (R and bash) used in the data handling or analyses associated with the manuscript:
 
-
-Table of contents:
 - [Filtering of data sets](#filtering-of-datasets)
   	* [Genetic relatedness](#genetic-relatedness)
 - [Modeling AMY1 CN based on subsistence and demography](#modeling-amy1-cn-based-on-subsistence-and-demography)
