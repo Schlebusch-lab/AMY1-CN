@@ -5,14 +5,24 @@ Table of contents:
 - [Filtering of data sets](#filtering-of-datasets)
   	* [Genetic relatedness](##genetic-relatedness)
 - [Modeling AMY1 CN based on subsistence and demography](#modeling-amy1-cn-based-on-subsistence-and-demography)
-    * []()
-  	* []()
-  	* []()
-  	* []()
-  	* []()
-  	* []()
+    * [Model formulations](##model-formulations)
+  	* [Model assumptions and stability]()
+  	* [Model comparisons]()
+- [Data transformations before model fit]()
+  	* [ILR transformation]()
+  	* [IBS matrix from genotype data]()
+  	* [Neighbor-Joining tree from IBS matrix]()
+  	* [Phylogenetic variance-covariance (VCV) matrix]()
+  	* [Principal component analysis from genotype data]()
+  	* [Supervised ADMIXTURE]()
+ - [Out of Africa dispersal]()
+  	* [Geographical distances between non-Sub-Saharan populations and East Africa]()
+  	* [Measures of diversity at the AMY1 locus]()
+- [Measures of phylogenetic signal]()
+  	* [Phylogenetic signal]()
+  	* [Phylogenetic correlogram]()
+  	* [Local indicators of phylogenetic association]()
 
-- ...
 
 # Filtering of data sets
 
