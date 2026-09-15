@@ -1,3 +1,13 @@
+This document contains code chunks (R and bash) used in the data handling or analyses associated with the manuscript:
+
+
+Table of contents:
+- [This is the link text](#heading-title)
+  	* ...
+  	* ...
+- ...
+- ...
+
 # Filtering of data sets
 
 ## Genetic relatedness
