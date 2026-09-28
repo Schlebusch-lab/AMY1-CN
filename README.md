@@ -1,13 +1,13 @@
 (manuscript currently under revision)
 
-# Rethinking human *AMY1* copy number evolution in light of demographic history  
+----
+
+## Rethinking human *AMY1* copy number evolution in light of demographic history  
 Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afifa Chowdhury, Susanne T. Green, Pakou Harena, Lebarama Bakrobena, Forka Leypey Mathew Fomine, Peter Ebbesen, Zelalem GebreMariam Tolesa, Wendawek Abebe Mengesha, Minique de Castro, Vinet Coetzee, Himla Soodyall, Leon Mundeke, Igor Matonda, Joseph Koni Muluwa, Koen Bostoen, Sara Pacchiarotti, Johanna von Seth, Torsten Günther, Concetta Burgarella, Carina Schlebusch
 
 *Corresponding authors*
 - Andrea Soler i Núñez (andrea.soler-i-nunez@ebc.uu.se)
 - Carina Schlebusch (carina.schlebusch@ebc.uu.se)
-
-----
 
 *Summary*  
 Dietary change is often invoked as a major selective force in human evolution, with increased copy number of the salivary amylase gene (AMY1) cited as an adaptation to starch-rich agricultural diets. However, most evidence for this model comes from limited sampling and analyses that do not fully account for shared ancestry. Here we combine newly generated ddPCR estimates from 390 Sub-Saharan individuals with published estimates from up to 1,306 individuals worldwide and re-evaluate AMY1 evolution using ancestry-aware models. Across Africa, AMY1 copy number shows no consistent association with agriculture. Globally, differences between agriculturalists and non-agriculturalists are smaller than previously reported and similarly explained by shared ancestry. Phylogenetic analyses further reveal baseline differences in AMY1 copy number between distantly related clades, pointing to deep demographic processes shaping present-day variation. These results challenge the “agriculture hypothesis” and identify demographic history, rather than subsistence, as the primary driver of AMY1 CN worldwide.
