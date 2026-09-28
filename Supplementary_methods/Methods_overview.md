@@ -222,8 +222,6 @@ for (model_name in names(models)[-1]) {
 
 ```ruby
 
-# BAYES FACTOR
-
 # 'models' is a list of all models run with the same data set
 
 models <- list(model_null, model_agriculture, ...) 
