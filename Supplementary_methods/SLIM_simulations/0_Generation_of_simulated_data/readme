@@ -1,1 +1,328 @@
-copy the SLIM scripts here
+// ============================================================
+// CNV selection simulation — 10×N burn-in (73,000 generations)
+//
+// Burn-in:    gen 1       → 73,000  (Ne = 7,300 start)
+// Demo start: gen 73,001  → 85,000  (= present day)
+// Generation time = 25 years
+// ============================================================
+
+initialize() {
+	defineConstant("L",       1e5);    // Length of the AMY1 locus (chromosome 1)
+	defineConstant("L_neut",   1e6);   // Length of the neutral chromosome (chromosome 2)
+	defineConstant("CNV_START", 0);    // Start position of the AMY1 locus
+	defineConstant("CNV_END",   1e5);  // End position of the AMY1 locus
+	defineConstant("MU_CNV",  0.0001); // Per-haplosome CNV mutation rate (microsatellite-like)
+	defineConstant("MAX_CN",  10);     // Hard cap on extra AMY1 copies per haplosome;
+                                      // duplications are blocked above this threshold
+                                      // (diploid max = 2 × MAX_CN + 2 = 22)
+
+
+// ── SLiMgui fallback ──────────────────────────────────────────────────────────
+// When running interactively in SLiMgui, S_CNV and the random seed must be
+// defined here since they are normally passed via command-line (-d flag).
+// S_label is used to name output files and defaults to "000" (neutral model).
+if (exists("slimgui")) {
+		defineConstant("S_CNV", 0.000);       // Selection coefficient (neutral default)
+		defineConstant("S_label", "000");     // Output file label matching S_CNV
+    defineConstant("seed_label", "test"); // Run identifier for output filenames
+    defineConstant("seed",       1);      // Random seed (passed via -d seed=N on cluster)
+		setSeed(1);                           // Fixed seed for reproducibility in GUI
+	}
+	
+	setSeed(seed);
+	defineConstant("RUN_ID", seed_label);	// Unique run identifier used in output filenames
+
+// m1: CNV copy markers — stackable, never auto-converted to substitution.
+// Each m1 instance on a haplosome represents one extra AMY1 copy.
+// Selection coefficient S_CNV is applied multiplicatively per extra copy.
+	initializeMutationType("m1", 0.5, "f", S_CNV);
+	initializeGenomicElementType("g1", m1, 1.0);
+	m1.convertToSubstitution = F;
+
+// m2: neutral SNPs on the background chromosome
+	initializeMutationType("m2", 0.5, "f", 0.0);
+	initializeGenomicElementType("g2", m2, 1.0);
+	
+// Chromosome 1: AMY1 locus — no background mutation rate, no recombination
+	initializeChromosome(1, L, "A");
+	initializeGenomicElement(g1, 0, L - 1);
+	initializeMutationRate(0);
+	initializeRecombinationRate(0);
+	
+// Chromosome 2: neutral background — mutation rate from Gravel et al. 2011 model and standard recombination rates
+	initializeChromosome(2, L_neut, "A");
+	initializeGenomicElement(g2, 0, L_neut - 1);
+	initializeMutationRate(2.36e-8);//2.36e-8);
+	initializeRecombinationRate(1e-8);
+}
+
+// ============================================================
+// Demographic model
+// Population split times in kya assume 25 years per generation.
+//
+// Population map:
+//   p0  = KS-1  (Khoe-San 1)         p7  = IND  (South/Central Asia)
+//   p1  = KS-2  (Khoe-San 2)         p8  = SEA  (SE Asia / Oceania)
+//   p2  = RHG   (Rainforest HG)      p9  = CeA  (Central Asia)
+//   p3  = WA    (West Africans)      p10 = NAM  (Native Americans)
+//   p4  = EA    (East Africans)      p11 = BSP  (Bantu speakers)
+//   p5  = EUR   (Europeans)          p12 = MidE (Middle East)
+//   p6  = SIB   (Siberians)
+// ============================================================
+
+1 early() {
+	sim.addSubpop("p1", 7300);  // Ancestral African population from Gravel et al. 2011; burn-in begins
+}
+
+// 300 kya — Khoe-San lineage diverges from the main African trunk
+73001 early() {
+	p1.setSubpopulationSize(14000);
+	sim.addSubpopSplit("p2", 12000, p1);
+	p1.setSubpopulationSize(2000);
+}
+
+// 200 kya — Rainforest HG (p3) diverges; Khoe-San 1 (p0) splits from Khoe-San 2 (p1)
+77000 early() {
+	sim.addSubpopSplit("p3", 11000, p2);
+	p2.setSubpopulationSize(1000);
+	sim.addSubpopSplit("p0", 1000, p1);
+	p1.setSubpopulationSize(1000);
+}
+
+// 150 kya — West African / Bantu ancestor (p4) diverges from the RHG trunk (p3)
+79000 early() {
+	sim.addSubpopSplit("p4", 5500, p3);
+	p3.setSubpopulationSize(5500);
+}
+
+// 80 kya — East African ancestor (p5) diverges; seeds the Out-of-Africa lineage
+81800 early() {
+	sim.addSubpopSplit("p5", 1550, p4);
+}
+
+// 50 kya — Out-of-Africa split: European ancestor (p5) and Asian trunk (p6) split
+83000 early() {
+	sim.addSubpopSplit("p6", 550, p5);
+	p5.setSubpopulationSize(1000);
+}
+
+// EUR growth: exponential expansion from 50 kya to 10 kya (r = 0.18% per generation)
+83000:84600 early() {
+	t = sim.cycle - 83000;
+	p5.setSubpopulationSize(asInteger(round(1000 * (1 + 0.0017766)^t)));
+}
+
+// Asian trunk growth: 50 kya → 40 kya (r = 0.22% per generation)
+83000:83400 early() {
+	t = sim.cycle - 83000;
+	p6.setSubpopulationSize(asInteger(round(550 * (1 + 0.0022408)^t)));
+}
+
+// 40 kya — South/Central Asia (p7) splits from the Asian trunk (p6)
+83400 early() {
+	t = sim.cycle - 83000;
+	sim.addSubpopSplit("p7", asInteger(round(110 * (1 + 0.0022408)^t)), p6);
+}
+
+// Post-split exponential growth for IND (p7) and the residual Asian trunk (p6).
+// p6 shrinks as populations split off; both grow at the Asian rate (r = 0.22%/gen).
+83400: early() {
+	t = sim.cycle - 83000;
+	p7.setSubpopulationSize(asInteger(round(110 * (1 + 0.0022408)^t)));
+	p6.setSubpopulationSize(asInteger(round(430 * (1 + 0.0022408)^t)));
+}
+
+// 30 kya — SE Asia / Oceania (p8) splits from the Asian trunk (p6)
+83800 early() {
+	t = sim.cycle - 83000;
+	sim.addSubpopSplit("p8", asInteger(round(110 * (1 + 0.0022408)^t)), p6);
+}
+
+// Post-split exponential growth for SEA (p8) and the residual Asian trunk (p6).
+83800: early() {
+	t = sim.cycle - 83000;
+	p8.setSubpopulationSize(asInteger(round(110 * (1 + 0.0022408)^t)));
+	p6.setSubpopulationSize(asInteger(round(330 * (1 + 0.0022408)^t)));
+}
+
+// 20 kya — Central Asia (p9) splits from the Asian trunk (p6)
+84200 early() {
+	t = sim.cycle - 83000;
+	sim.addSubpopSplit("p9", asInteger(round(110 * (1 + 0.0022408)^t)), p6);
+}
+
+// Post-split exponential growth for CeA (p9) and the residual Asian trunk (p6).
+84200: early() {
+	t = sim.cycle - 83000;
+	p9.setSubpopulationSize(asInteger(round(110 * (1 + 0.0022408)^t)));
+	p6.setSubpopulationSize(asInteger(round(220 * (1 + 0.0022408)^t)));
+}
+
+// 15 kya — Native Americans (p10) split from Asian trunk (p6);
+//           Bantu speakers (p11) split from West African ancestor (p3)
+84400 early() {
+	t = sim.cycle - 83000;
+	sim.addSubpopSplit("p10", asInteger(round(110 * (1 + 0.0022408)^t)), p6);
+	sim.addSubpopSplit("p11", 2750, p3);
+	p3.setSubpopulationSize(2750);
+}
+
+// Post-split exponential growth for NAM (p10) and the residual Asian trunk (p6),
+// both expanding at the same rate as the parent Asian lineage (r = 0.22%/gen).
+84400: early() {
+	t = sim.cycle - 83000;
+	p10.setSubpopulationSize(asInteger(round(110 * (1 + 0.0022408)^t)));
+	p6.setSubpopulationSize(asInteger(round(110 * (1 + 0.0022408)^t)));
+}
+
+// 10 kya — Middle East (p12) splits from the European lineage (p5)
+84600 early() {
+	t = sim.cycle - 83000;
+	sim.addSubpopSplit("p12", asInteger(round(p5.individualCount / 3)), p5);
+}
+
+// Post-split exponential growth for MidE (p12) and EUR (p5),
+// both expanding at the European rate (r = 0.18%/gen) from 10 kya onward.
+84600: early() {
+	t = sim.cycle - 83000;
+	p12.setSubpopulationSize(asInteger(round(333 * (1 + 0.0017766)^t)));
+	p5.setSubpopulationSize(asInteger(round(666 * (1 + 0.0017766)^t)));
+}
+
+// ============================================================
+// AMY1 CN dynamics — seeding and mutation process
+// ============================================================
+
+// Seed 2 extra AMY1 copies per haplosome at the onset of demographic history,
+// yielding an ancestral diploid CN of 6 (2 baseline + 2 extra per haplosome).
+// This reflects the three-copy haplotype inferred to have seeded modern diversity
+// (Inchley et al. 2016; Bolognini et al. 2024; Yilmaz et al. 2024).
+73001 late() {
+	pos = c(50000, 55000);
+	CNchromosomes = sim.subpopulations.individuals.haplosomesForChromosomes(chromosomes=1);
+	for (i in pos)
+		CNchromosomes.addNewDrawnMutation(m1, i);
+}
+
+// CNV duplication and deletion dynamics — applied every generation.
+// A single Bernoulli trial with P = MU_CNV determines whether a CN-change
+// event occurs on each haplosome. If it does, the direction (gain or loss)
+// is chosen with equal probability (0.5 each). The magnitude of the change
+// follows: P(|ΔCN| = 2) = 0.90, P(|ΔCN| = 1) = 0.05, P(|ΔCN| = 3) = 0.05,
+// reflecting the tendency of NAHR to act on paired repeat units.
+73001: late() {
+	for (ind in sim.subpopulations.individuals) {
+		for (genome in ind.haplosomesForChromosomes(chromosomes=1)) {
+			
+			current_cn = genome.countOfMutationsOfType(m1) + 1; // haploid CN (baseline = 1)
+
+      // DUPLICATION — only attempted if below the hard cap
+			if (current_cn < MAX_CN) {
+
+
+        // Fixed per-haplosome rate, consistent with microsatellite mutation
+				eff_dup_rate = MU_CNV;
+				
+				// ----------------------------------------------------------
+				// DUPLICATION (Principle 1 + 3)
+				// ----------------------------------------------------------
+				if (rbinom(1, 1, eff_dup_rate) == 1) {
+					
+					r = runif(1);
+					if      (r < 0.90) n_add = 2;
+					else if (r < 0.95) n_add = 1;
+					else               n_add = 3;
+					
+					
+					for (k in seqLen(n_add)) {
+						genome.addNewDrawnMutation(m1, rdunif(1, CNV_START, CNV_END - 1));
+					}
+				}
+			}
+			
+      // DELETION — only attempted if at least one extra copy exists
+      // (the implicit baseline copy at CN = 1 is always protected.
+			if (current_cn > 2) {
+
+        // Fixed per-haplosome rate, consistent with microsatellite mutation
+				eff_del_rate = MU_CNV;
+				
+				if (rbinom(1, 1, eff_del_rate) == 1) {
+					
+					copies = genome.mutationsOfType(m1);
+					if (copies.size() > 0) {
+						r = runif(1);
+						if      (r < 0.90) n_del = 2;
+						else if (r < 0.95) n_del = 1;
+						else               n_del = 3;
+
+						if (n_del > copies.size()) n_del = copies.size();	// cannot delete more than exist
+						
+						genome.removeMutations(sample(copies, n_del));
+					}
+				}
+			}
+		}
+	}
+}
+
+// ============================================================
+// Mutation effects — neutral until agricultural transition
+//
+// mutationEffect() returns 1.0 (neutral) for each population until
+// its documented agricultural onset. After that, SLiM's default
+// multiplicative fitness scheme applies: each extra AMY1 copy
+// contributes a factor of (1 + S_CNV), favouring higher CN.
+//
+// Agriculture onset times (gen = 85,000 − kya × 40):
+//   10 kya → gen 84,600 : EUR (p5), IND (p7), MidE (p12)
+//    9 kya → gen 84,640 : CeA (p9)
+//    8 kya → gen 84,680 : SEA (p8)
+//    5 kya → gen 84,800 : WA  (p3), NAM (p10), BSP (p11)
+//    4 kya → gen 84,840 : EA  (p4)
+//   Never  : KS-1 (p0), KS-2 (p1), RHG (p2), SIB (p6)
+// ============================================================
+
+73001:85000 mutationEffect(m1, p0)  { return 1.0; }  // KS-1 — never adopted agriculture
+73001:85000 mutationEffect(m1, p1)  { return 1.0; }  // KS-2 — never adopted agriculture
+73001:85000 mutationEffect(m1, p2)  { return 1.0; }  // RHG  — never adopted agriculture
+73001:85000 mutationEffect(m1, p6)  { return 1.0; }  // SIB  — never adopted agriculture
+
+73001:84839 mutationEffect(m1, p4)  { return 1.0; }  // EA   — agriculture from 4 kya
+73001:84799 mutationEffect(m1, p3)  { return 1.0; }  // WA   — agriculture from 5 kya
+73001:84799 mutationEffect(m1, p11) { return 1.0; }  // BSP  — agriculture from 5 kya
+73001:84799 mutationEffect(m1, p10) { return 1.0; }  // NAM  — agriculture from 5 kya
+
+73001:84599 mutationEffect(m1, p5)  { return 1.0; }  // EUR  — agriculture from 10 kya
+73001:84599 mutationEffect(m1, p7)  { return 1.0; }  // IND  — agriculture from 10 kya
+73001:84599 mutationEffect(m1, p12) { return 1.0; }  // MidE — agriculture from 10 kya
+
+73001:84639 mutationEffect(m1, p9)  { return 1.0; }  // CeA  — agriculture from 9 kya
+73001:84679 mutationEffect(m1, p8)  { return 1.0; }  // SEA  — agriculture from 8 kya
+
+// ============================================================
+// Output — present day (gen 85,000)
+// ============================================================
+
+85000 late() {
+	genomes = NULL;
+	vcf_idx = 0;  // Sequential index used to match CN output rows to VCF samples
+	
+  // Print CN summary: one line per sampled individual
+  // Format: i{vcf_idx}  ind_index  diploid_CN  pop_id	
+	for (pop in sim.subpopulations) {
+		sample = pop.sampleIndividuals(60); // Sample 60 diploid individuals per population
+		
+		for (ind in sample) {
+			n_copies = sum(ind.haplosomes.countOfMutationsOfType(m1));
+			catn("i" + vcf_idx + "\t" + ind.index + "\t" + (n_copies + 2) + "\tpop" + pop.id);
+			genomes = c(genomes, ind.haplosomesForChromosomes(chromosomes=2));
+			vcf_idx = vcf_idx + 1;
+		}
+	}
+	
+  // Write neutral chromosome 2 genotypes to VCF for demographic inference
+	genomes.outputHaplosomesToVCF(filePath="PATH/TO/RESULTS/FOLDER" + RUN_ID  + "_AMY_S" + S_label + ".vcf");
+	
+	sim.simulationFinished();
+}
