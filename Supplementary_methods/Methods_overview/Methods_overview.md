@@ -1,4 +1,10 @@
-This document contains code chunks (R and bash) used in the data handling or analyses associated with the manuscript:
+This document contains code chunks (.R and .sh) used in data handling or analyses associated with the manuscript:
+
+## Rethinking human AMY1 copy number evolution in light of demographic history
+
+Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afifa Chowdhury, Susanne T. Green, Pakou Harena, Lebarama Bakrobena, Forka Leypey Mathew Fomine, Peter Ebbesen, Zelalem GebreMariam Tolesa, Wendawek Abebe Mengesha, Minique de Castro, Vinet Coetzee, Himla Soodyall, Leon Mundeke, Igor Matonda, Joseph Koni Muluwa, Koen Bostoen, Sara Pacchiarotti, Johanna von Seth, Torsten Günther, Concetta Burgarella, Carina Schlebusch
+
+----
 
 - [Filtering of data sets](#filtering-of-datasets)
   	* [Genetic relatedness](#genetic-relatedness)
@@ -22,6 +28,7 @@ This document contains code chunks (R and bash) used in the data handling or ana
   	* [Phylogenetic correlogram](#phylogenetic-correlogram)
   	* [Local indicators of phylogenetic association](#local-indicators-of-phylogenetic-association)
 
+----
 
 # Filtering of data sets
 
