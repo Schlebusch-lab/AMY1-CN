@@ -4,7 +4,7 @@
 
 This repository contains code and data related to the manuscript:
 
-## Rethinking human *AMY1* copy number evolution in light of demographic history  
+### Rethinking human *AMY1* copy number evolution in light of demographic history  
 Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afifa Chowdhury, Susanne T. Green, Pakou Harena, Lebarama Bakrobena, Forka Leypey Mathew Fomine, Peter Ebbesen, Zelalem GebreMariam Tolesa, Wendawek Abebe Mengesha, Minique de Castro, Vinet Coetzee, Himla Soodyall, Leon Mundeke, Igor Matonda, Joseph Koni Muluwa, Koen Bostoen, Sara Pacchiarotti, Johanna von Seth, Torsten Günther, Concetta Burgarella, Carina Schlebusch
 
 ----
@@ -23,7 +23,7 @@ Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afif
 
 ----
 
-## Contact information
+### Contact information
 
 Corresponding authors: 
 - Andrea Soler i Núñez (andrea.soler-i-nunez@ebc.uu.se)
