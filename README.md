@@ -25,7 +25,7 @@ Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afif
 
 ## Contact information
 
-Manuscript corresponding authors: 
+Corresponding authors: 
 - Andrea Soler i Núñez (andrea.soler-i-nunez@ebc.uu.se)
 - Carina Schlebusch (carina.schlebusch@ebc.uu.se)
 
