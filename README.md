@@ -12,8 +12,8 @@ Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afif
 # Contents of this repository
 
 * **Supplementary methods**
-  - Overview of code (.Md) ([access here](Supplementary_methods/Methods_overview/Methods_overview.md))
-  - SLIM simulations (.SLIM .R .sh) ([access here](Supplementary_methods/SLIM_simulations))
+  - Overview of code (.Md) ([access](Supplementary_methods/Methods_overview/Methods_overview.md))
+  - SLIM simulations (.SLIM .R .sh) ([access](Supplementary_methods/SLIM_simulations))
 
 * **Supplementary materials**
   - Supplementary tables (.xlsx) (*DOI to publication*)
