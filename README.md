@@ -16,10 +16,10 @@ Andrea Soler i Núñez, Francesco Giannelli, Cécile Joly, Camille Humbert, Afif
   - SLIM simulations (.SLIM .R .sh) ([access](Supplementary_methods/SLIM_simulations))
 
 * **Supplementary data**
-  - Supplementary tables S1-S3 (.xlsx) (*DOI to publication*)
+  - Supplementary tables S1-S3 (.xlsx) ([access](Supplementary_data))
 
 * **Main and supplementary figures**
-  - Figures 1-4 and S1-S15 (.pdf) (*DOI to publication*)
+  - Figures 1-4 and S1-S15 (.pdf) ([access](Supplementary_figures))
 
 ----
 
